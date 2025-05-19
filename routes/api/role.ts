@@ -2,6 +2,7 @@ const router = require('express').Router();
 import auth from '../../config/auth';
 import type {Request, Response} from 'express';
 import UserRole from "../../models/userrole"
+import { AuthRequest } from '../../types/express/auth';
 
 router.get('/roles', auth, async (req: Request, res: Response) => {
   try {
@@ -29,8 +30,8 @@ router.post('/roles', auth, async (req: Request, res: Response) => {
   }
 });
 
-router.get('/roles/:id', auth, async (req:Request, res: Response) => {
-  const { id } = req.id;
+router.get('/roles/:id', auth, async (req:AuthRequest, res: Response) => {
+  const { id } = req.params;
   const userRole = await UserRole.findById(id);
   return !userRole ? res.sendStatus(404) : res.send(userRole);
 });

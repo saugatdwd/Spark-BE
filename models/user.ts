@@ -24,8 +24,10 @@ const userSchema = new Schema(
     role: {
       name: { type: String, default: "User" },
     },
+    location: {type: String, required: true},
     tokens: [{ token: { type: String, required: true } }],
     dob: { type: Date, required: [true, 'Date of birth is required'] },
+    preference: {type: String, enum:["men", "women", "everyone"], required: true},
   },
   { timestamps: true }
 );
@@ -37,7 +39,7 @@ userSchema.pre("save", async function (next: () => void) {
   const user = this;
   if (user.isModified("password")) {
     const salt = await bcrypt.genSalt(10);
-    user.password = bcrypt.hash(user.password, salt);
+    user.password = await bcrypt.hash(user.password, salt);  
   }
   next();
 });
@@ -67,7 +69,7 @@ userSchema.methods.generateAuthToken = async function () {
   try {
     const token = jwt.sign(
       { _id: user._id.toString() },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET!,
       {
         expiresIn: "1h",
       }
