@@ -39,7 +39,7 @@ userSchema.pre("save", async function (next: () => void) {
   const user = this;
   if (user.isModified("password")) {
     const salt = await bcrypt.genSalt(10);
-    user.password = bcrypt.hash(user.password, salt);
+    user.password = await bcrypt.hash(user.password, salt);  
   }
   next();
 });
@@ -69,7 +69,7 @@ userSchema.methods.generateAuthToken = async function () {
   try {
     const token = jwt.sign(
       { _id: user._id.toString() },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET!,
       {
         expiresIn: "1h",
       }

@@ -1,4 +1,4 @@
-export function calculateAge(dob) {
+export function calculateAge(dob: Date | string) {
     const birthDate = new Date(dob);
     const today = new Date();
   

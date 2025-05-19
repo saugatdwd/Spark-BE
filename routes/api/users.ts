@@ -107,7 +107,7 @@ router.get("/:id", auth, async (req: Request, res: Response) => {
  * @access  Private
  */
 router.patch("/me", auth, async (req: Request, res: Response) => {
-  const validationErrors = [];
+  const validationErrors: string[] = [];
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "email", "password", "role"];
   const isValidOperation = updates.every((update) => {
@@ -140,7 +140,7 @@ router.patch("/me", auth, async (req: Request, res: Response) => {
  * @access  Private
  */
 router.patch("/:id", auth, async (req: Request, res: Response) => {
-  const validationErrors = [];
+  const validationErrors: string[] = [];
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "email", "password", "role"];
   const isValidOperation = updates.every((update) => {
@@ -159,8 +159,9 @@ router.patch("/:id", auth, async (req: Request, res: Response) => {
     const user = await User.findById(_id);
     if (!user) return res.sendStatus(404);
     updates.forEach((update) => {
-      user[update] = req.body[update];
+      (user as any)[update] = req.body[update];
     });
+
     await user.save();
 
     return res.send(user);

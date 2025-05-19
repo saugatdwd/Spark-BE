@@ -3,6 +3,7 @@ import type {Request, Response} from 'express';
 
 const router = require('express').Router();
 import auth from '../../config/auth';
+import { AuthRequest } from "../../types/express/auth";
 
 /**
  * @route   POST /auth/login
@@ -27,10 +28,10 @@ router.post('/login', async (req: Request, res: Response) => {
  * @desc    Logout a user
  * @access  Private
  */
-router.post('/logout', auth, async (req: Request, res: Response) => {
+router.post('/logout', auth, async (req: AuthRequest, res: Response) => {
   const { user } = req;
   try {
-    user.tokens = user.tokens.filter(token => {
+    user.tokens = user?.tokens?.filter((token: { token: string; }) => {
       return token.token !== req.token;
     });
     await user.save();
