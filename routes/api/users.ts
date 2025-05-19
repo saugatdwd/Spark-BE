@@ -5,6 +5,8 @@ import auth from "../../config/auth";
 import { calculateAge } from "../../utils/date.utils";
 import { HydratedDocument } from "mongoose";
 import { UserType } from "../../types/user";
+import bcrypt from "bcryptjs";
+
 
 /**
  * @route   POST /users
@@ -12,14 +14,21 @@ import { UserType } from "../../types/user";
  * @access  Public
  */
 router.post("/", async (req: Request, res: Response) => {
-  const user = new User(req.body);
   try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    const user = new User({
+      ...req.body,
+      password: hashedPassword,
+    });
+
     await user.save();
-    const token = await user.generateAuthToken();
+
+    const token = await user.generateAuthToken(); 
     res.status(201).send({ user, token });
   } catch (e) {
-    res.status(400).send(e);
     console.log(e);
+    res.status(400).send(e);
   }
 });
 
