@@ -24,8 +24,10 @@ const userSchema = new Schema(
     role: {
       name: { type: String, default: "User" },
     },
+    location: {type: String, required: true},
     tokens: [{ token: { type: String, required: true } }],
     dob: { type: Date, required: [true, 'Date of birth is required'] },
+    preference: {type: String, enum:["men", "women", "everyone"], required: true},
   },
   { timestamps: true }
 );

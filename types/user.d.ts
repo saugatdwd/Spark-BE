@@ -8,6 +8,8 @@ export interface UserType {
     role?: string;
     createdAt: Date;
     updatedAt: Date;
+    location:string;
+    preference:String;
     tokens?: { token: string }[];
     generateAuthToken: () => Promise<string>;
     save: () => Promise<void>;

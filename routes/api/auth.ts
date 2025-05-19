@@ -10,12 +10,9 @@ import auth from '../../config/auth';
  * @access  Public
  */
 router.post('/login', async (req: Request, res: Response) => {
-  console.log(res)
   try {
     const { email, password } = req.body;
     const user = await User.findByCredentials(email, password);
-    // console.log(user, "userr")
-    console.log(await user.generateAuthToken())
     const token = await user.generateAuthToken();
     res.send({ user, token });
   } catch (e) {

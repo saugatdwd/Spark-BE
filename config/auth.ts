@@ -7,9 +7,9 @@ import jwt from "jsonwebtoken";
 import User from '../models/user';
 
 
-const auth = async (req: Request, res: Response, next) => {
+const auth = async (req: Request, res: Response, next: () => void) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    const token = req.header("Authorization")?.replace("Bearer ", "") || "";
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({
       _id: decoded._id,
