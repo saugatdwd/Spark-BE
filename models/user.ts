@@ -96,10 +96,10 @@ userSchema.statics.findByCredentials = async function (
   const User = this;
   const user = await User.findOne({ email });
   if (!user) throw new Error("Unable to login");
-
+  
   const isMatch = await bcrypt.compare(password, user.password);
+  console.log(password,"Password", user.password)
   if (!isMatch) throw new Error("Unable to login");
-
   return user;
 };
 const User = mongoose.model<IUser, IUserModel>("User", userSchema);
