@@ -15,11 +15,9 @@ import bcrypt from "bcryptjs";
  */
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
     const user = new User({
       ...req.body,
-      password: hashedPassword,
+      password: req.body.password,
     });
 
     await user.save();
