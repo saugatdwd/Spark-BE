@@ -15,10 +15,9 @@ connectDB();
 // CORS setup to allow your frontend IP
 app.use(
   cors({
-    origin: "http://192.168.1.65:8081", // Allow only the frontend to access this server
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,  // Allow credentials (cookies, authentication)
   })
 );
 
