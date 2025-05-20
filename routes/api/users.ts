@@ -43,7 +43,6 @@ router.get("/", auth, async (req: Request, res: Response) => {
       users,
       age,
     });
-    console.log(age, "Agee");
   } catch (e) {
     res.status(400).send(e);
   }

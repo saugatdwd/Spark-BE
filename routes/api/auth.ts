@@ -13,8 +13,8 @@ import { AuthRequest } from "../../types/express/auth";
 router.post('/login', async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
+
     const user = await User.findByCredentials(email, password);
-    console.log(user, "USER")
     const token = await user.generateAuthToken();
     res.send({ user, token });
   } catch (e) {
