@@ -32,18 +32,21 @@ router.post("/", async (req: Request, res: Response) => {
 
 /**
  * @route   GET /users
- * @desc    Get all users
+ * @desc    Get all users with their ages
  * @access  Private
  */
 router.get("/", auth, async (req: Request, res: Response) => {
   try {
     const users = await User.find({});
-    const age = calculateAge(req.user.dob);
-    res.send({
-      users,
-      age,
+    const usersWithAge = users.map(user => {
+      const age = calculateAge(user.dob);
+      return {
+        ...user.toObject(),
+        age,
+      };
     });
-    console.log(age, "Agee");
+    res.send(usersWithAge);
+    console.log(usersWithAge, "Users with Age");
   } catch (e) {
     res.status(400).send(e);
   }
@@ -51,25 +54,13 @@ router.get("/", auth, async (req: Request, res: Response) => {
 
 /**
  * @route   GET /users/me
- * @desc    Get logged in user details
+ * @desc    Get logged in user details with age
  * @access  Private
  */
 router.get("/me", auth, async (req: Request, res: Response) => {
   try {
     const userDoc = req.user as HydratedDocument<UserType>;
-
-    const {
-      _id,
-      name,
-      email,
-      gender,
-      dob,
-      role,
-      createdAt,
-      updatedAt,
-      location,
-      preference,
-    } = userDoc.toObject();
+    const { _id, name, email, gender, dob, role, createdAt, updatedAt } = userDoc.toObject();
     const age = calculateAge(dob);
 
     res.send({
@@ -95,14 +86,18 @@ router.get("/me", auth, async (req: Request, res: Response) => {
 
 /**
  * @route   GET /users/:id
- * @desc    Get user by id
+ * @desc    Get user by id with age
  * @access  Private
  */
 router.get("/:id", auth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
-    return !user ? res.sendStatus(404) : res.send(user);
+    if (!user) {
+      return res.sendStatus(404);
+    }
+    const age = calculateAge(user.dob);
+    return res.send({ ...user.toObject(), age });
   } catch (e) {
     return res.sendStatus(400);
   }
@@ -135,7 +130,8 @@ router.patch("/me", auth, async (req: Request, res: Response) => {
     });
 
     await user.save();
-    return res.send(user);
+    const age = calculateAge(user.dob);
+    return res.send({ ...user.toObject(), age });
   } catch (e) {
     return res.status(400).send(e);
   }
@@ -170,8 +166,8 @@ router.patch("/:id", auth, async (req: Request, res: Response) => {
     });
 
     await user.save();
-
-    return res.send(user);
+    const age = calculateAge(user.dob);
+    return res.send({ ...user.toObject(), age });
   } catch (e) {
     return res.status(400).send(e);
   }
