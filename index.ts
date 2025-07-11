@@ -13,13 +13,28 @@ const app = express();
 connectDB();
 
 // CORS setup to allow your frontend IP
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:8081",
+  "http://192.168.1.66:8081",
+  "*"
+];
+
 app.use(
   cors({
-    origin: "*",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
+
 
 
 // Middlewares & Configs

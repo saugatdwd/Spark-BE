@@ -22,6 +22,11 @@ router.post("/", async (req: Request, res: Response) => {
 
     await user.save();
 
+    // Create a profile for the new user
+    const Profile = require('../../models/profiles').default;
+    await Profile.create({ user: user._id });
+
+
     const token = await user.generateAuthToken(); 
     res.status(201).send({ user, token });
   } catch (e) {
