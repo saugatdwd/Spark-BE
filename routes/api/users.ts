@@ -13,6 +13,33 @@ import bcrypt from "bcryptjs";
  * @desc    Register new user
  * @access  Public
  */
+
+/**
+ * @openapi
+ * /api/users:
+ *   post:
+ *     summary: Register a new user
+ *     tags:
+ *       - Users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Bad request
+ */
 router.post("/", async (req: Request, res: Response) => {
   try {
     const user = new User({
@@ -22,7 +49,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     await user.save();
 
-    // Create a profile for the new user
+
     const Profile = require('../../models/profiles').default;
     await Profile.create({ user: user._id });
 
@@ -40,6 +67,30 @@ router.post("/", async (req: Request, res: Response) => {
  * @desc    Get all users
  * @access  Private
  */
+/**
+ * @openapi
+ * /api/users:
+ *   get:
+ *     summary: Get all users
+ *     tags:
+ *       - Users
+ *     responses:
+ *       200: 
+ *         description: Successful response
+ *         content: 
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *                 age:
+ *                   type: number
+ *       400:
+ *         description: Bad request
+ */
 router.get("/", auth, async (req: Request, res: Response) => {
   try {
     const users = await User.find({});
@@ -48,7 +99,6 @@ router.get("/", auth, async (req: Request, res: Response) => {
       users,
       age,
     });
-    console.log(age, "Agee");
   } catch (e) {
     res.status(400).send(e);
   }
