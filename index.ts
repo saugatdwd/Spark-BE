@@ -4,10 +4,14 @@ import logger from "morgan";
 import dotenv from "dotenv";
 import connectDB from "./config/mongoose";
 import routes from "./routes";
+import http from 'http';
+import setupSocket from './config/socket';
+import setupSwagger from './config/swagger';
 
 dotenv.config({ path: ".env" });
 
 const app = express();
+const server = http.createServer(app);
 
 // Connect to MongoDB
 connectDB();
@@ -35,8 +39,6 @@ app.use(
   })
 );
 
-
-
 // Middlewares & Configs
 app.use(logger("dev"));
 app.use(express.json());
@@ -48,6 +50,8 @@ app.use((req: any, res: any, next: any) => {
 });
 
 app.use(routes);
+setupSocket(server);
+setupSwagger(app);
 
 const port = process.env.PORT || 8082;
 const address = process.env.SERVER_ADDRESS || "localhost";
@@ -56,6 +60,6 @@ app.get("/", (req: any, res: any) => {
   res.send("Hello World!");
 });
 
-app.listen(port, () =>
+server.listen(port, () =>
   console.log(`Server running on http://${address}:${port}`)
 );
