@@ -28,6 +28,9 @@ const userSchema = new Schema(
     tokens: [{ token: { type: String, required: true } }],
     dob: { type: Date, required: [true, 'Date of birth is required'] },
     preference: {type: String, enum:["men", "women", "everyone"], required: true},
+    bio: { type: String, default: "" },
+    interests: { type: [String], default: [] },
+    profilePicture: { type: String, default: "" },
   },
   { timestamps: true }
 );
@@ -75,7 +78,7 @@ userSchema.methods.generateAuthToken = async function () {
       }
     );
 
-    user.tokens = user.tokens.concat({ token });
+    user.tokens = [{ token }];
 
     await user.save(); 
 
