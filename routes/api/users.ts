@@ -1,11 +1,10 @@
 import type { Request, Response } from "express";
-const router = require("express").Router();
-import User from "../../models/user";
-import auth from "../../config/auth";
-import { calculateAge } from "../../utils/date.utils";
 import { HydratedDocument } from "mongoose";
+import auth from "../../config/auth";
+import User from "../../models/user";
 import { UserType } from "../../types/user";
-import bcrypt from "bcryptjs";
+import { calculateAge } from "../../utils/date.utils";
+const router = require("express").Router();
 
 
 /**
@@ -169,19 +168,21 @@ router.get("/:id", auth, async (req: Request, res: Response) => {
  * @access  Private
  */
 router.patch("/me", auth, async (req: Request, res: Response) => {
+  
   const validationErrors: string[] = [];
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "password", "role"];
+  const file = Object.keys(req.files || {});
+  const allowedUpdates = ["name", "email", "password", "role", "bio", "interests", "photos"];
   const isValidOperation = updates.every((update) => {
     const isValid = allowedUpdates.includes(update);
-    if (!isValid) validationErrors.push(update);
+    if (!isValid) validationErrors.push(...update, ...file);
     return isValid;
   });
 
   if (!isValidOperation)
     return res
       .status(400)
-      .send({ error: `Invalid updates: ${validationErrors.join(",")}` });
+      .send({ error: `${validationErrors.join(",")} should not exist` });
 
   try {
     const { user } = req;
