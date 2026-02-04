@@ -1,4 +1,4 @@
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import http from 'http';
 import Message from '../models/message';
 import Profile from '../models/profiles';
@@ -13,7 +13,7 @@ export default function setupSocket(server: http.Server) {
     }
   });
 
-  io.use(async (socket, next) => {
+  io.use(async (socket: Socket, next: (err?: Error) => void) => {
     try {
       const token = socket.handshake.auth.token;
       if (!token) return next(new Error('Authentication error'));
@@ -31,14 +31,14 @@ export default function setupSocket(server: http.Server) {
     }
   });
 
-  io.on('connection', (socket) => {
+  io.on('connection', (socket: Socket) => {
     const user = (socket as any).user;
     socket.join(user._id.toString());
 
-    socket.on('send_message', async ({ receiverId, content }) => {
+    socket.on('send_message', async ({ receiverId, content }: { receiverId: string; content: string }) => {
 
       const senderProfile = await Profile.findOne({ user: user._id });
-      if (!senderProfile || !senderProfile.matches.includes(receiverId)) {
+      if (!senderProfile || !senderProfile.matches.includes(receiverId as any)) {
         socket.emit('error', 'You can only message matched users.');
         return;
       }
