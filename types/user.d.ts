@@ -10,7 +10,10 @@ export interface UserType {
   updatedAt: Date;
   location: string;
   preference: String;
+  profilePicture?: string;
   tokens?: { token: string }[];
+  bio?: string;
+  interest?: string[];
   generateAuthToken: () => Promise<string>;
   save: () => Promise<void>;
   remove: () => Promise<void>;

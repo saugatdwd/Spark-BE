@@ -1,11 +1,10 @@
 import type { Request, Response } from "express";
-const router = require("express").Router();
-import User from "../../models/user";
-import auth from "../../config/auth";
-import { calculateAge } from "../../utils/date.utils";
 import { HydratedDocument } from "mongoose";
+import auth from "../../config/auth";
+import User from "../../models/user";
 import { UserType } from "../../types/user";
-import bcrypt from "bcryptjs";
+import { calculateAge } from "../../utils/date.utils";
+const router = require("express").Router();
 
 
 /**
@@ -124,6 +123,9 @@ router.get("/me", auth, async (req: Request, res: Response) => {
       updatedAt,
       location,
       preference,
+      profilePicture,
+      bio,
+      interest
     } = userDoc.toObject();
     const age = calculateAge(dob);
 
@@ -140,6 +142,9 @@ router.get("/me", auth, async (req: Request, res: Response) => {
         age,
         location,
         preference,
+        profilePicture,
+        bio: bio ? bio : null,
+        interest: interest ? interest : []
       },
     });
   } catch (e) {
@@ -264,3 +269,4 @@ router.delete("/:id", auth, async (req: Request, res: Response) => {
 });
 
 export { router as userRoutes };
+

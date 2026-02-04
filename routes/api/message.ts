@@ -19,6 +19,16 @@ router.post('/send', auth, async (req:Request, res:Response) => {
     }
     const message = new Message({ sender: senderId, receiver: receiverId, content });
     await message.save();
+
+    // Emit real-time event using Socket.IO if available
+    if (req.app.get('io')) {
+      req.app.get('io').to(receiverId.toString()).emit('receive_message', {
+        senderId,
+        content,
+        timestamp: message.timestamp
+      });
+    }
+
     res.json({ success: true, message });
   } catch (e) {
     res.status(500).json({ error: 'Server error.' });
@@ -42,6 +52,22 @@ router.get('/history/:userId', auth, async (req:Request, res:Response) => {
         { sender: otherUserId, receiver: userId }
       ]
     }).sort({ timestamp: 1 });
+    res.json({ messages });
+  } catch (e) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+// Get all messages for the authenticated user
+router.get('/list', auth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user._id;
+    const messages = await Message.find({
+      $or: [
+        { sender: userId },
+        { receiver: userId }
+      ]
+    }).sort({ timestamp: -1 });
     res.json({ messages });
   } catch (e) {
     res.status(500).json({ error: 'Server error.' });
