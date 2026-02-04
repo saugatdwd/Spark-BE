@@ -48,4 +48,50 @@ router.get('/history/:userId', auth, async (req:Request, res:Response) => {
   }
 });
 
+router.get('/list', auth, async (req:Request, res:Response) => {
+  try {
+    const userId = req.user._id;
+    
+    const conversations = await Message.aggregate([
+      {
+        $match: {
+          $or: [
+            { sender: new mongoose.Types.ObjectId(userId) },
+            { receiver: new mongoose.Types.ObjectId(userId) }
+          ]
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $cond: [
+              { $eq: ['$sender', new mongoose.Types.ObjectId(userId)] },
+              '$receiver',
+              '$sender'
+            ]
+          },
+          lastMessage: { $last: '$content' },
+          timestamp: { $last: '$timestamp' },
+          messageCount: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { timestamp: -1 }
+      },
+      {
+        $lookup: {
+          from: 'profiles',
+          localField: '_id',
+          foreignField: 'user',
+          as: 'userProfile'
+        }
+      }
+    ]);
+    
+    res.json({ success: true, conversations });
+  } catch (e) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 export default router;
